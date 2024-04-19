@@ -17,23 +17,23 @@ import (
 
 func main() {
 	var (
-		opsgenieApiKey       = flag.String("opsgenie-api-key", os.Getenv("OPSGENIE_API_KEY"), "Opsgenie API Key. Will be read from environment 'OPSGENIE_API_KEY'")
-		slackApiKey          = flag.String("slack-api-key", os.Getenv("SLACK_API_KEY"), "slack API Key. Will be read from environment 'SLACK_API_KEY'")
+		opsgenieApiKey = flag.String("opsgenie-api-key", os.Getenv("OPSGENIE_API_KEY"), "Opsgenie API Key. Will be read from environment 'OPSGENIE_API_KEY'")
+		slackApiKey    = flag.String("slack-api-key", os.Getenv("SLACK_API_KEY"), "slack API Key. Will be read from environment 'SLACK_API_KEY'")
 
 		opsgenieScheduleName = flag.String("opsgenie-schedule", "", "Opsgenie Team Schedule Name")
 		slackGroupHandle     = flag.String("slack-group", "", "Slack Usergroup handle without @")
 	)
 	flag.Parse()
-  var missingArgs []string
+	var missingArgs []string
 	flag.VisitAll(func(f *flag.Flag) {
 		if f.Value.String() == "" {
-      missingArgs = append(missingArgs, f.Name)
+			missingArgs = append(missingArgs, f.Name)
 		}
 	})
 	if len(missingArgs) > 0 {
-    fmt.Fprintf(os.Stderr, "Missing required arguments: %v\n\n", missingArgs)
+		fmt.Fprintf(os.Stderr, "Missing required arguments: %v\n\n", missingArgs)
 
-    flag.PrintDefaults()
+		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
@@ -54,6 +54,8 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	ctx, shutdown := context.WithCancel(context.Background())
+	defer shutdown()
+
 	go func() {
 		<-sigs
 		logger.Info("cancelling...")
